@@ -1,5 +1,4 @@
 import lzma
-import base64
 
 
 def bytes_to_mb(size_bytes: int) -> float:
@@ -15,8 +14,6 @@ input_size = len(input_bytes)
 compressed_bytes = lzma.compress(input_bytes)
 compressed_size = len(compressed_bytes)
 
-compressed_b64 = base64.b64encode(compressed_bytes).decode("ascii")
-
 saved_bytes = input_size - compressed_size
 saved_percent = (saved_bytes / input_size) * 100 if input_size > 0 else 0
 
@@ -25,5 +22,5 @@ print(
     f"Compressed size: {compressed_size} bytes ({bytes_to_mb(compressed_size):.4f} MB)")
 print(f"Saved: {saved_bytes} bytes ({saved_percent:.2f}%)")
 
-with open("compressed.txt", "w", encoding="utf-8") as f:
-    f.write(compressed_b64)
+with open("compressed.lzma", "wb") as f:
+    f.write(compressed_bytes)
