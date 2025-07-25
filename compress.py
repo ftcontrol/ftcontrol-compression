@@ -1,6 +1,9 @@
 import lzma
 import zlib
 import bz2
+import brotli
+import lz4.frame
+import zstandard as zstd
 
 
 def bytes_to_mb(size_bytes: int) -> float:
@@ -16,10 +19,20 @@ def compress_zlib(data: bytes) -> bytes:
 
 
 def compress_bz2(data: bytes) -> bytes:
-    compressor = bz2.BZ2Compressor()
-    compressed = compressor.compress(data)
-    compressed += compressor.flush()
-    return compressed
+    return bz2.compress(data, compresslevel=9)
+
+
+def compress_brotli(data: bytes) -> bytes:
+    return brotli.compress(data, quality=11)
+
+
+def compress_lz4(data: bytes) -> bytes:
+    return lz4.frame.compress(data, compression_level=16)
+
+
+def compress_zstd(data: bytes) -> bytes:
+    cctx = zstd.ZstdCompressor(level=22)
+    return cctx.compress(data)
 
 
 with open("data.json", "r", encoding="utf-8") as f:
@@ -30,14 +43,12 @@ input_size = len(input_bytes)
 
 results = {}
 
-lzma_compressed = compress_lzma(input_bytes)
-results['LZMA'] = lzma_compressed
-
-zlib_compressed = compress_zlib(input_bytes)
-results['Zlib'] = zlib_compressed
-
-bz2_compressed = compress_bz2(input_bytes)
-results['Bz2'] = bz2_compressed
+results['LZMA'] = compress_lzma(input_bytes)
+results['Zlib'] = compress_zlib(input_bytes)
+results['Bz2'] = compress_bz2(input_bytes)
+results['Brotli'] = compress_brotli(input_bytes)
+results['LZ4'] = compress_lz4(input_bytes)
+results['Zstandard'] = compress_zstd(input_bytes)
 
 print(
     f"Original size: {input_size} bytes ({bytes_to_mb(input_size):.4f} MB)\n")
