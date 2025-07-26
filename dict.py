@@ -4,7 +4,7 @@ from collections import Counter
 import sys
 
 
-def generate_dictionary(text, min_len=3, max_len=20, top_n=100):
+def generate_dictionary(text, min_len=20, max_len=40, top_n=1000):
     substr_counter = Counter()
     length = len(text)
     total_lengths = max_len - min_len + 1
